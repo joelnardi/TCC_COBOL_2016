@@ -1,0 +1,154 @@
+//KC03BAB JOB (12345678),'JOEL',MSGLEVEL=(1,1),REGION=0M,           
+// NOTIFY=&SYSUID,MSGCLASS=A,CLASS=A                                
+//****                                                              
+//COBOL1 EXEC IGYWCLG,                                              
+// PARM.COBOL='TEST,RENT,APOST,OBJECT,NODYNAM,LIB,SIZE(5048376)'    
+//COBOL.SYSPRINT DD SYSOUT=*                                        
+//COBOL.SYSIN DD *                                                  
+       IDENTIFICATION DIVISION.                                     
+       PROGRAM-ID. ORDE.                                            
+       ENVIRONMENT DIVISION.                                        
+       CONFIGURATION SECTION.                                       
+       INPUT-OUTPUT SECTION.                                        
+       FILE-CONTROL.                                                
+           SELECT PPAL1 ASSIGN TO PPAL1.                            
+           SELECT PPAL2 ASSIGN TO PPAL2.                            
+           SELECT PPAL3 ASSIGN TO PPAL3.                            
+           SELECT PPAL ASSIGN TO PPAL.                              
+           SELECT T07ORDE ASSIGN TO T07ORDE.                        
+       DATA DIVISION.                                               
+       FILE SECTION.                                                
+       FD PPAL1                                                     
+           BLOCK CONTAINS 0 RECORDS.                                
+       01 REG-PPAL1 PIC X(240).                                     
+       FD PPAL2                                                     
+           BLOCK CONTAINS 0 RECORDS.                                
+       01 REG-PPAL2 PIC X(240).                                     
+       FD PPAL3                                                     
+           BLOCK CONTAINS 0 RECORDS.                                
+       01 REG-PPAL3 PIC X(240).                                     
+       FD PPAL                                                      
+           LABEL RECORDS ARE OMITTED.                               
+       01 REG-PPAL PIC X(240).                                      
+       FD T07ORDE                                                   
+           LABEL RECORDS ARE OMITTED.                               
+       01 REG-T07ORDE PIC X(240).                                   
+       WORKING-STORAGE SECTION.                                
+       01 REGISTRO-PPAL1.                                      
+        03 IDREPUESTO-PPAL1 PIC 9(3).                          
+        03 DESCREPUESTO-PPAL1 PIC X(30).                       
+        03 IDCLIENTE-PPAL1 PIC 9(5).                           
+        03 MODELOAUTO-PPAL1 PIC X(30).                         
+        03 PATENTE-PPAL1 PIC X(7).                             
+        03 DNI-PPAL1 PIC X(8).                                 
+        03 DESCREPARACION-PPAL1 PIC X(30).                     
+        03 FECHAINGRESO-PPAL1 PIC 9(6).                        
+        03 FECHAEGRESO-PPAL1 PIC 9(6).                         
+        03 ESTADO-PPAL1 PIC X(1).                              
+       01 REGISTRO-PPAL2.                                      
+        03 IDREPUESTO-PPAL2 PIC 9(3).                          
+        03 DESCREPUESTO-PPAL2 PIC X(30).                       
+        03 IDCLIENTE-PPAL2 PIC 9(5).                           
+        03 MODELOAUTO-PPAL2 PIC X(30).                         
+        03 PATENTE-PPAL2 PIC X(7).                             
+        03 DNI-PPAL2 PIC X(8).                                 
+        03 DESCREPARACION-PPAL2 PIC X(30).                     
+        03 FECHAINGRESO-PPAL2 PIC 9(6).                        
+        03 FECHAEGRESO-PPAL2 PIC 9(6).                         
+        03 ESTADO-PPAL2 PIC X(1).                              
+       01 REGISTRO-PPAL3.                                      
+        03 IDREPUESTO-PPAL3 PIC 9(3).                          
+        03 DESCREPUESTO-PPAL3 PIC X(30).                       
+        03 IDCLIENTE-PPAL3 PIC 9(5).                           
+        03 MODELOAUTO-PPAL3 PIC X(30).                         
+        03 PATENTE-PPAL3 PIC X(7).                             
+        03 DNI-PPAL3 PIC X(8).                                 
+        03 DESCREPARACION-PPAL3 PIC X(30).                     
+        03 FECHAINGRESO-PPAL3 PIC 9(6).                        
+        03 FECHAEGRESO-PPAL3 PIC 9(6).                         
+        03 ESTADO-PPAL3 PIC X(1).                              
+       01 REGISTRO-T07ORDE.                                    
+        03 IDREPUESTO-ORDE PIC 9(3).                           
+        03 DESCREPUESTO-ORDE PIC X(30).                        
+        03 IDCLIENTE-ORDE PIC 9(5).                            
+        03 MODELOAUTO-ORDE PIC X(30).                                   
+        03 PATENTE-ORDE PIC X(7).                                       
+        03 DNI-ORDE PIC X(8).                                           
+        03 DESCREPARACION-ORDE PIC X(30).                               
+        03 FECHAINGRESO-ORDE PIC 9(6).                                  
+        03 FECHAEGRESO-ORDE PIC 9(6).                                   
+        03 ESTADO-ORDE PIC X(1).                                        
+       01 EOF-PPAL1 PIC 9 VALUE 0.                                      
+       01 EOF-PPAL2 PIC 9 VALUE 0.                                      
+       01 EOF-PPAL3 PIC 9 VALUE 0.                                      
+       01 EOF-T07ORDE PIC 9 VALUE 0.                                    
+       PROCEDURE DIVISION.                                              
+           OPEN INPUT PPAL1.                                            
+           OPEN INPUT PPAL2.                                            
+           OPEN OUTPUT T07ORDE.                                         
+           PERFORM LEER-PPAL1.                                          
+           PERFORM LEER-PPAL2.                                          
+           PERFORM ORDENAMIENTO UNTIL EOF-PPAL1 = 1 OR EOF-PPAL2 = 1.   
+           IF EOF-PPAL1 = 1 AND EOF-PPAL2 = 0 THEN                      
+               PERFORM UNTIL EOF-PPAL2 = 1                              
+               WRITE REG-T07ORDE FROM REGISTRO-PPAL2                    
+               PERFORM LEER-PPAL2                                       
+               END-PERFORM.                                             
+           IF EOF-PPAL1 = 0 AND EOF-PPAL2 = 1 THEN                      
+               PERFORM UNTIL EOF-PPAL1 = 1                              
+               WRITE REG-T07ORDE FROM REGISTRO-PPAL1                    
+               PERFORM LEER-PPAL1                                       
+               END-PERFORM.                                             
+           CLOSE PPAL1 PPAL2 T07ORDE.                                   
+           OPEN INPUT T07ORDE.                                          
+           OPEN INPUT PPAL3.                                            
+           OPEN OUTPUT PPAL.                                            
+           PERFORM LEER-T07ORDE.                                        
+           PERFORM LEER-PPAL3.                                          
+           PERFORM ORDENAMIENTO2 UNTIL EOF-PPAL3 = 1 OR EOF-T07ORDE = 1.
+           IF EOF-PPAL3 = 1 AND EOF-T07ORDE = 0 THEN                    
+               PERFORM UNTIL EOF-T07ORDE = 1                            
+               WRITE REG-PPAL FROM REGISTRO-T07ORDE                     
+               PERFORM LEER-T07ORDE                                     
+               END-PERFORM.                                             
+           IF EOF-T07ORDE = 1 AND EOF-PPAL3 = 0 THEN                    
+               PERFORM UNTIL EOF-PPAL3 = 1                              
+               WRITE REG-PPAL FROM REGISTRO-PPAL3                       
+               PERFORM LEER-PPAL3                                       
+               END-PERFORM.                                             
+           CLOSE T07ORDE PPAL3 PPAL.                                    
+           STOP RUN.                                                    
+       LEER-T07ORDE.                                                    
+           IF EOF-T07ORDE = 0 THEN                                      
+           READ T07ORDE INTO REGISTRO-T07ORDE AT END MOVE 1             
+               TO EOF-T07ORDE.                                          
+       LEER-PPAL1.                                                      
+           IF EOF-PPAL1 = 0 THEN                                        
+           READ PPAL1 INTO REGISTRO-PPAL1 AT END MOVE 1 TO EOF-PPAL1.   
+       LEER-PPAL2.                                                      
+           IF EOF-PPAL2 = 0 THEN                                        
+           READ PPAL2 INTO REGISTRO-PPAL2 AT END MOVE 1 TO EOF-PPAL2.   
+       LEER-PPAL3.                                                      
+           IF EOF-PPAL3 = 0 THEN                                        
+           READ PPAL3 INTO REGISTRO-PPAL3 AT END MOVE 1 TO EOF-PPAL3.   
+       ORDENAMIENTO.                                                    
+           IF IDCLIENTE-PPAL1 < IDCLIENTE-PPAL2 THEN                    
+               WRITE REG-T07ORDE FROM REGISTRO-PPAL1                    
+               PERFORM LEER-PPAL1                                       
+           ELSE                                                         
+               WRITE REG-T07ORDE FROM REGISTRO-PPAL2                    
+               PERFORM LEER-PPAL2.                                      
+       ORDENAMIENTO2.                                                   
+           IF IDCLIENTE-ORDE < IDCLIENTE-PPAL3 THEN                     
+               WRITE REG-PPAL FROM REGISTRO-T07ORDE                     
+               PERFORM LEER-T07ORDE                                     
+           ELSE                                                         
+               WRITE REG-PPAL FROM REGISTRO-PPAL3                       
+               PERFORM LEER-PPAL3.                                      
+//GO.SYSOUT DD SYSOUT=*                                                 
+//GO.SYSPRINT DD SYSOUT=*                                               
+//GO.PPAL1 DD DSN=KC03BAB.CATALOGO.ENTRADA(T07PPAL1),DISP=SHR   
+//GO.PPAL2 DD DSN=KC03BAB.CATALOGO.ENTRADA(T07PPAL2),DISP=SHR   
+//GO.PPAL3 DD DSN=KC03BAB.CATALOGO.ENTRADA(T07PPAL3),DISP=SHR   
+//GO.T07ORDE DD DSN=KC03BAB.CATALOGO.ENTRADA(T07ORDE),DISP=SHR  
+//GO.PPAL DD DSN=KC03BAB.CATALOGO.PPAL,DISP=SHR                              
